@@ -1,0 +1,28 @@
+{
+  "name": "windows-desktop-tool",
+  "version": "1.0.0",
+  "description": "A simple Windows desktop tool built with Electron",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "dist": "electron-builder --win"
+  },
+  "author": "Blackbox",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^25.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "build": {
+    "appId": "com.blackbox.desktoptool",
+    "productName": "Desktop Tool",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "icon.png"
+    }
+  }
+}
