@@ -1,0 +1,26 @@
+{
+  "name": "@planmark/core",
+  "version": "0.1.0",
+  "description": "PlanMark core: markup model, undo history, and the .planmark bundle format. Framework-agnostic TypeScript.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "jszip": "^3.10.1"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.8"
+  }
+}
