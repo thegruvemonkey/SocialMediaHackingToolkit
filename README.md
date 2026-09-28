@@ -1,115 +1,96 @@
-<p align="center">
-  <img src="https://i.ibb.co/sgjVVHZ/logo.png" alt=""/>
-</p>
+# PlanMark
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Version-0.3.1-purple?style=for-the-badge">
-  <img src="https://img.shields.io/github/stars/RedKatz/SocialMediaHackingToolkit?style=for-the-badge">
-  <img src="https://img.shields.io/github/issues/RedKatz/SocialMediaHackingToolkit?style=for-the-badge">
-  <img src="https://img.shields.io/github/forks/RedKatz/SocialMediaHackingToolkit?style=for-the-badge">
-</p>
+An original **AEC PDF markup app** for desktop and the field — pen, cloud, callout
+and more on top of construction drawings, saved as a portable `.planmark` bundle.
+Inspired by the Bluebeam Revu *workflows*, built with our own UX and code. No
+Bluebeam names, assets, or binaries are used.
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Author-RedKatz-blue?style=flat-square">
-  <img src="https://img.shields.io/badge/Open%20Source-Yes-darkgreen?style=flat-square">
-  <img src="https://img.shields.io/badge/Maintained%3F-Yes-lightblue?style=flat-square">
-  <img src="https://img.shields.io/badge/Written%20In-Python & Php-darkcyan?style=flat-square">
-</p>
+> **Design goals**
+> - Desktop = power. Mobile = field: offline-first, fat targets, dark UI.
+> - Open a PDF in 2 taps. One toolbar. Autosave. Undo always visible.
+> - Markup statuses, filter by author/status. No account for local files.
 
+## First deliverable (this repo)
 
-##
+A runnable **desktop viewer** that:
 
-<h3><p align="center">Disclaimer</p></h3>
- 
-</p>
+- opens large PDFs with pan/zoom, page thumbnails, and bookmarks,
+- places **pen, cloud, and callout** markups (plus highlight, box, arrow, text) as an
+  **overlay** (markups are stored as JSON, the PDF is never flattened),
+- shows a filterable **markup list** with per-markup **status** (author/status filter),
+- **autosaves** to a `.planmark` file (a zip of the original PDF + `markups.json`) and
+  reopens it losslessly, with **undo/redo** always available.
 
-</div>
+## Monorepo layout
 
+```
+packages/
+  core/     # framework-agnostic: markup model, undo history, .planmark format
+  ui/       # React components: PDF viewer + SVG markup layer, toolbar, list
+apps/
+  desktop/  # Electron + Vite + React shell
+  mobile/   # (planned) React Native field app
+  api/       # (planned) sync service
+```
 
-<i><b>SocialMediaHackingToolkit</b> has been created solely for educational and research purposes. I do not take any responsibility for any improper use of the software by third parties.
+The `.planmark` file is a zip archive:
 
-The use of <b>SocialMediaHackingToolk</b> for illegal purposes, such as unauthorized access to computer systems, is illegal and may result in legal consequences.
+| Entry           | Contents                                              |
+| --------------- | ----------------------------------------------------- |
+| `document.pdf`  | the original PDF bytes (unmodified)                   |
+| `markups.json`  | `{ version, markups: Markup[] }` overlay data         |
+| `manifest.json` | format version, document name, page count, timestamps |
 
-Additionally, the use of <b>SocialMediaHackingToolkit</b> may violate the security and privacy policies of third parties, such as Instagram, Facebook, Twitter, or Gmail. I do not take any responsibility for any violations of regulations by the user.
+Markup coordinates are stored in **page space** (PDF points, top-left origin), so
+they stay aligned at any zoom and on any device.
 
-It is recommended to use <b>SocialMediaHackingToolkit</b> only with explicit authorization from the system owner and to always comply with the regulations regarding computer security and privacy.
+## Getting started
 
+Requires Node 18.18+.
 
-<b>This tool contains materials that can be potentially damaging or dangerous for social media</b>. Refer to the laws in your province/country before accessing, using,or in any other way utilizing this in a wrong way.
+```bash
+npm install
+npm run dev          # launches the Electron desktop app (Vite dev server + Electron)
+```
 
-<b>This Tool is made for educational purposes only</b>.</i>
+Then **Open PDF**, pick the Pen / Cloud / Callout tool, draw, and use **Save**
+(`Ctrl/Cmd+S`). After the first save, edits autosave to the same `.planmark` file.
+Reopen it any time with **Open .planmark**.
 
+### Useful scripts
 
-##
+```bash
+npm run typecheck                       # typecheck every workspace
+npm run test --workspace @planmark/core # .planmark round-trip + undo/redo tests
+npm run build --workspace @planmark/desktop  # production build (renderer + electron)
+```
 
-### Features
-  
-- Beginners friendly
-- Ip changing
-  - windscribe-vpn support
-- Compatible with
-  - Linux
-  - Windows
-  - Termux 
+## Keyboard
 
- ## 
-  
- ### Installation
-- Install with one command (linux)
- 
-      git clone https://github.com/RedKatz/SocialMediaHackingToolkit/ && cd "SocialMediaHackingToolkit" && cd src && python3 setup.py && cd .. && python3 smh.py 
-  
-- Linux - Termux
+| Shortcut              | Action            |
+| --------------------- | ----------------- |
+| `Ctrl/Cmd + S`        | Save `.planmark`  |
+| `Ctrl/Cmd + Z`        | Undo              |
+| `Ctrl/Cmd + Shift + Z`| Redo              |
+| `Delete` / `Backspace`| Delete selection  |
+| `Ctrl/Cmd + wheel`    | Zoom              |
 
-  ```
-  git clone https://github.com/RedKatz/SocialMediaHackingToolkit/
-  cd "SocialMediaHackingToolkit"
-  cd src
-  python3 setup.py
-  cd ..
-  python3 smh.py
-  ```
-- Windows
-  ```
-  download the zip file
-  go inside the src folder and run setup.py
-  now go inside main folder and run smh.py
-  ```
-  
-##
+## Roadmap
 
- 
+Built in order (this repo delivers stage 0–1 on desktop):
 
-<details>
-  <summary><h3>Tested on</h3></summary>
+0. **Viewer** — large PDFs, pan/zoom, bookmarks, thumbnails. ✅
+1. **Markups** — pen, highlight, arrow, line, polyline, rect, ellipse, cloud, callout,
+   text, count, photo pin; overlay JSON; markup list. *(core model complete; pen,
+   highlight, cloud, callout, box, arrow, text tools shipped)*
+2. **Scale** — calibrate; length/area/perimeter/count; imperial + metric.
+3. **Pages** — combine/extract/rotate/reorder; export flattened PDF + CSV summary.
+4. **Tool sets** — My Tools; import/export JSON.
+5. **Sync** — projects check-in/out; live sessions; offline queue.
+6. **Field** — camera; offline checkout; one-tap status.
 
-- **Ubuntu**
-- **Debian**
-- **Arch**
-- **Termux**
-- **Windows11**
-</details>
- 
-  
-<b>SocialMediaHackingToolkit</b> requires following programs to run properly 
-- `windscribe-cli`
-- `python3`
+Out of MVP: CAD plugins, Batch Link, Dynamic Fill, Excel Quantity Link, OCR, 3D.
 
-##
+## License
 
-<h3 align="center"><i>:: Tool ::</i></h3>
-<p align="center">
-</p>
-<p align="center">
-  <img src="./images/video.gif" alt=""/>
-</p>
- 
-  
-##
-
-#### Find me on:
-
-<p>
-  <img src="https://camo.githubusercontent.com/1bd9c02d067702f4cc56bc23d0432260cf89cf46ecae6c48e0dbc656ae7fc483/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f4769746875622d626c75653f7374796c653d666f722d7468652d6261646765266c6f676f3d676974687562" alt=""/>
-
-</p>
+MIT
